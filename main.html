@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hello OpenCV.js</title>
+</head>
+<body>
+<h2>Hello OpenCV.js</h2>
+<p id="status">OpenCV.js is loading...</p>
+<div>
+  <div class="inputoutput">
+    <img id="imageSrc" width="500" height="500" alt="No Image" />
+    <div class="caption">imageSrc <input type="file" id="fileInput" name="file" /></div>
+  </div>
+  <div class="inputoutput">
+    <canvas id="canvasOutput" ></canvas>
+    <div class="caption">canvasOutput</div>
+  </div>
+</div>
+<script src="https://docs.opencv.org/3.4.0/opencv.js"></script>
+<script type="text/javascript">
+let imgElement = document.getElementById('imageSrc');
+let inputElement = document.getElementById('fileInput');
+inputElement.addEventListener('change', (e) => {
+  imgElement.src = URL.createObjectURL(e.target.files[0]);
+}, false);
+imgElement.onload = function() {
+    let src = cv.imread(imgElement);
+let dst = new cv.Mat();
+const size = new cv.Size(256, 256)
+cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY);
+cv.resize(dst, dst, size,0, 0, cv.INTER_AREA);
+const median = getMedian(dst.data)
+
+cv.threshold(dst, dst, median, getMax(dst.data), cv.THRESH_BINARY)
+console.log(dst.data)
+cv.imshow('canvasOutput', dst);
+
+src.delete();
+dst.delete();
+};
+function onOpenCvReady() {
+  document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
+}
+
+function getMedian(data){
+    const mid = data.length / 2
+    data = [...data].sort((a, b) => a-b)
+    return data.length % 2 !== 0 ? data[mid] : (data[mid - 1] + data[mid]) / 2;
+}
+
+function getMax(data){
+    data = [...data].sort((a, b) => a-b)
+    return data[data.length - 1]
+}
+</script>
+</body>
+</html>
