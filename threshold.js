@@ -2,6 +2,8 @@ const imagePicker = document.querySelector("#uploadImage");
 const imageShow = document.querySelector("#defaultImage");
 const canvasGray = document.querySelector("#outputGray");
 const canvasThreshold = document.querySelector("#outputThreshold");
+const median = document.querySelector("#median")
+const col = document.querySelector("#column")
 
 imagePicker.addEventListener("change", (event) => {
   imageShow.src = URL.createObjectURL(event.target.files[0]);
@@ -29,9 +31,13 @@ imageShow.onload = () => {
   const medianVal = getMedian(dst.data);
   const maxVal = getMax(dst.data);
 
+  //output 
+  median.innerHTML = medianVal
+  col.innerHTML = dst.data.length
+
   //do thresholding binary 
   //threshold(source, destination, threshold value, maxValue, type)
-  cv.threshold(dst, dst, medianVal, maxVal, cv.THRESH_BINARY)
+  cv.threshold(dst, dst, medianVal, 256, cv.THRESH_BINARY)
   cv.imshow("outputThreshold", dst)
 
   src.delete()
